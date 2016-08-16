@@ -109,7 +109,7 @@
         }
     });
 
-    river.View.prototype._defineGetter('messageHandlerMap', function () {
+    river.View.prototype.__defineGetter__('messageHandlerMap', function () {
         return this._messageHandlerMap;
     });
 })();
