@@ -9,9 +9,9 @@
         },
 
         eventMessage: function (name, data) {
-            var eventMessageObject = this._eventMap[name]
+            var eventMessageObject = this._eventMap[name];
             if (!eventMessageObject) {
-                return false;
+                return;
             }
 
             for (var key in eventMessageObject) {
@@ -54,6 +54,117 @@
 
             this._viewMap[name] = null;
             return true;
+        },
+
+        show: function (name) {
+            if (!name) {
+                return;
+            }
+
+            var view = this._viewMap[name];
+            if (!view) {
+                return;
+            }
+
+            if (view.isShowing) {
+                return;
+            }
+
+            view.setParam(arguments.length > 1 ? Array.prototype.slice.call(arguments, 1) : null);
+            view.show();
+        },
+        
+        hide: function (name) {
+            if (!name) {
+                return;
+            }
+
+            var view = this._viewMap[name];
+            if (!view) {
+                return;
+            }
+
+
+            if (!view.isShowing) {
+                return;
+            }
+
+            view.hide();
+        },
+        
+        pause: function (name) {
+            if (!name) {
+                return;
+            }
+
+            var view = this._viewMap[name];
+            if (!view) {
+                return;
+            }
+
+
+            if (!view.isShowing) {
+                return;
+            }
+
+            view.pause();
+        },
+        
+        resume: function (name) {
+            if (!name) {
+                return;
+            }
+
+            var view = this._viewMap[name];
+            if (!view) {
+                return;
+            }
+
+
+            if (view.isShowing) {
+                return;
+            }
+
+            view.resume();
+        },
+        
+        isShow: function (name) {
+            if (!name) {
+                return;
+            }
+
+            var view = this._viewMap[name];
+            if (!view) {
+                return;
+            }
+
+            return view.isShowing;
+        },
+        
+        isPause: function (name) {
+            if (!name) {
+                return;
+            }
+
+            var view = this._viewMap[name];
+            if (!view) {
+                return;
+            }
+
+            return view.isShowing;
+        },
+        
+        isReady: function (name) {
+            if (!name) {
+                return;
+            }
+
+            var view = this._viewMap[name];
+            if (!view) {
+                return;
+            }
+
+            return view.isShowing;
         }
     });
 })();

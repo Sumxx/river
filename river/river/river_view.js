@@ -8,13 +8,123 @@
         _res: null,
         _node: null,
         _isShowing: null,
+        _isPause: null,
+        _isReady: null,
+        _isLoadRes: null,
+        _param: null,
+        _parentNode: null,
+        _parentNodeZOlder: null,
 
         ctor: function () {
             this._touchHandlerMap = {};
             this._messageHandlerMap = {};
             this._isShowing = false;
+            this._isPause = false;
+            this._isReady = false;
+            this._isLoadRes = false;
+            this._param = [];
+        },
+
+        show: function () {
+            if (this._isPause) {
+                return;
+            }
+
+            if (this._isLoadRes) {
+                return;
+            }
+
+            if (!this._res || !this._res.length) {
+                return;
+            }
+
+            var needCache = [];
+            for (var index = 0; index < this._res.length; index++) {
+                var path = this._res[index];
+                if (!path) {
+                    continue;
+                }
+
+                if (cc.loader.cache[path]) {
+                    continue;
+                }
+
+                needCache.push(path);
+            }
+
+            if (needCache.length === 0) {
+                this.onReadyLoadRes_RiverIn();
+            } else {
+                this._isLoadRes = true;
+                cc.loader.load(needCache, this.onReadyLoadRes_RiverIn.bind(this));
+            }
         },
         
+        createViewNode: function (filePath) {
+            if (!filePath) {
+                return false;
+            }
+
+            this._node = ccs.csLoader.createNode(filePath);
+            return this._node ? true : false;
+        },
+
+        hide: function () {
+            if (!this._isShowing) {
+                return;
+            }
+
+            if (!this._node) {
+                return;
+            }
+
+            this._node.setVisible(false);
+            this.scheduleOnce(this.onDestroy_RiverIn, 0);
+        },
+
+        pause: function () {
+            if (!this._isShowing) {
+                return;
+            }
+
+            if (!this._node) {
+                return;
+            }
+
+            this._parentNode = this._node.getParent();
+            this._parentNodeZOlder = this._node.getLocalZOrder();
+            if (!this._parentNode) {
+                return;
+            }
+
+            this.onPause();
+            this._isPause = true;
+            this._node.retain();
+            this._node.removeFromParent();
+            river.ViewMgr.eventMessage(this._name + '.pause', this._node);
+        },
+
+        resume: function () {
+            if (this._isShowing) {
+                return;
+            }
+
+            if (!this._parentNode || !this._node) {
+                return;
+            }
+
+            this.onResume();
+            this._isPause = false;
+            this._node.release();
+            this._parentNode.addChild(this._node, this._parentNodeZOlder);
+            this._parentNode = null;
+            this._parentNodeZOlder = null;
+        },
+
+        setParam: function (param) {
+            this._param = param;
+        },
+
         getName: function () {
             return this._name;
         },
@@ -106,10 +216,62 @@
                     touchNode.endTouchCallBack();
                 }
             }
+        },
+        
+        onReadyLoadRes_RiverIn: function () {
+            this._isLoadRes = false;
+            this._isReady = true;
+            this._isShowing = true;
+            if (this._param && this._param.length > 0) {
+                this.onShow.apply(this, this._param);
+            } else {
+                this.onShow();
+            }
+        },
+
+        onDestroy_RiverIn: function () {
+            this._isReady = false;
+            this._isShowing = false;
+            this._isReady = false;
+            if (!this._node) {
+                return;
+            }
+
+            this.onHide();
+            this._node.removeFromParent();
+            this._node = null;
+        },
+
+        onShow: function () {
+            
+        },
+        
+        onHide: function () {
+            
+        },
+        
+        onPause: function () {
+
+        },
+        
+        onResume: function () {
+
         }
     });
 
     river.View.prototype.__defineGetter__('messageHandlerMap', function () {
         return this._messageHandlerMap;
+    });
+    
+    river.View.prototype.__defineGetter__('isShowing', function () {
+        return this._isShowing;
+    });
+
+    river.View.prototype.__defineGetter__('isPause', function () {
+        return this._isPause;
+    });
+
+    river.View.prototype.__defineGetter__('isReady', function () {
+        return this._isReady;
     });
 })();
