@@ -23,6 +23,7 @@
             this._isReady = false;
             this._isLoadRes = false;
             this._param = [];
+            this._res = [];
         },
 
         show: function () {
@@ -34,7 +35,7 @@
                 return;
             }
 
-            if (!this._res || !this._res.length) {
+            if (!this._res) {
                 return;
             }
 
@@ -273,5 +274,9 @@
 
     river.View.prototype.__defineGetter__('isReady', function () {
         return this._isReady;
+    });
+
+    river.View.prototype.__defineGetter__('node', function () {
+        return this._node;
     });
 })();

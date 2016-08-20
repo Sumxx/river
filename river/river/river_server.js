@@ -11,8 +11,8 @@
     };
 
     var login = function (name, password, host, port, cb) {
-        var route = 'river.handler.login';
-        pomelo.init(host, port, function () {
+        var route = 'connector.entryHandler.login';
+        pomelo.init({host: host, port: port}, function () {
             pomelo.request(route, {name: name, password: password}, function (req) {
                 pomelo.disconnect();
                 if (!req.code) {
@@ -24,7 +24,7 @@
     };
     
     var loginSectionServer = function (name, password, host, port, token, cb) {
-        var route = 'river.handler.section';
+        var route = 'connector.handler.section';
         pomelo.init(host, port, function () {
             pomelo.request(route, {name: name, password: password}, function (req) {
                 pomelo.disconnect();

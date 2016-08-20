@@ -1,2 +1,1 @@
-river = river || {};
-
+river = {};
