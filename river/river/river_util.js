@@ -1,7 +1,7 @@
 (function () {
     river.util = {};
 
-    river.util.callFunc = function (cb) {
+    river.util.callFunc = function (cb, oc) {
         if (!cb) {
             return;
         }
@@ -11,9 +11,9 @@
         }
 
         if (arguments.length > 1) {
-            cb.apply(null, Array.prototype.slice.call(arguments, 1));
+            cb.apply(oc, Array.prototype.slice.call(arguments, 2));
         } else {
-            cb.call(null);
+            cb.call(oc);
         }
     }
 })();

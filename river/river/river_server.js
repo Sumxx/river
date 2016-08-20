@@ -1,27 +1,13 @@
 (function () {
-    var connectServerConfig = {
-        host: '127.0.0.1',
-        port: '60222',
-        log: true
-    };
-
     var connServer = {};
     connServer.isInit = false;
-    
-    var createPlayerEvent = function () {
-        
-    };
 
-    var callMessageEvent = function () {
+    var eventEmitter = new river.Emitter();
+    river.emitterMgr.add(eventEmitter);
 
-    };
-    
-    var closeConn = function () {
-        
-    };
-
-    var logoff = function () {
-
+    var callMessageEvent = function (name) {
+        var params = Array.prototype.slice.call(arguments, 1);
+        river.emitterMgr.emit(name, params);
     };
 
     var login = function (name, password, host, port, cb) {
@@ -51,10 +37,7 @@
     };
 
     var initServerMessageHandler = function () {
-        pomelo.on('createPlayerEvent', createPlayerEvent);
-        pomelo.on('callMessageEvent', callMessageEvent);
-        pomelo.on('closeConn', closeConn);
-        pomelo.on('logoff', logoff);
+        pomelo.on('river.event', callMessageEvent);
     };
 
     connServer.login = function (name, password, host, port, cb) {

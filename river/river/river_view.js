@@ -177,7 +177,7 @@
             messageObject.push(callBack);
         },
 
-        eventMessage: function (name, data) {
+        emit: function (name, data) {
             if (!this._isShowing) {
                 return;
             }

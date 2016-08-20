@@ -1,5 +1,5 @@
 (function () {
-    river.ViewMgr = cc.Class.extend({
+    var ViewMgr = cc.Class.extend({
         _viewMap: null,
         _eventMap: null,
 
@@ -8,7 +8,7 @@
             this._eventMap = {};
         },
 
-        eventMessage: function (name, data) {
+        emit: function (name, data) {
             var eventMessageObject = this._eventMap[name];
             if (!eventMessageObject) {
                 return;
@@ -20,7 +20,7 @@
                     continue;
                 }
 
-                eventViewObject.eventMessage(name, data);
+                eventViewObject.emit(name, data);
             }
         },
 
@@ -167,4 +167,6 @@
             return view.isShowing;
         }
     });
+
+    river.viewMgr = new ViewMgr();
 })();
