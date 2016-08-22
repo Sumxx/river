@@ -1,0 +1,32 @@
+{
+    "project_type": "javascript",
+
+    "debugMode" : 1,
+    "showFPS" : true,
+    "frameRate" : 60,
+    "noCache" : false,
+    "id" : "gameCanvas",
+    "renderMode" : 0,
+    "engineDir":"frameworks/cocos2d-html5",
+
+    "modules" : ["cocos2d", "cocostudio"],
+
+    "jsList" : [
+        "src/resource.js",
+        "river/3rdparty/pomelo-cocos2d-js.js",
+        "river/river/river.js",
+        "river/river/river_util.js",
+        "river/river/river_server_emitter.js",
+        "river/river/river_server_emitter_mgr.js",
+        "river/river/river_entity.js",
+        "river/river/river_entity_mgr.js",
+        "river/river/river_server.js",
+        "river/river/river_container.js",
+        "river/river/river_view.js",
+        "river/river/river_view_mgr.js",
+
+        "src/main_logic.js",
+        "src/main_layer.js",
+        "src/server_emitter.js"
+    ]
+}
