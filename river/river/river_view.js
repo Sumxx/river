@@ -1,5 +1,5 @@
 (function () {
-    var FIND_NODE_MID_SIGN = ',';
+    var FIND_NODE_MID_SIGN = '.';
 
     river.View = cc.Class.extend({
         _name: 'river.view',
@@ -31,34 +31,37 @@
                 return;
             }
 
-            if (this._isLoadRes) {
-                return;
-            }
+            // 因效率问题，暂时考虑放弃
 
-            if (!this._res) {
-                return;
-            }
+            // if (this._isLoadRes) {
+            //     return;
+            // }
 
-            var needCache = [];
-            for (var index = 0; index < this._res.length; index++) {
-                var path = this._res[index];
-                if (!path) {
-                    continue;
-                }
+            // if (!this._res) {
+            //     return;
+            // }
 
-                if (cc.loader.cache[path]) {
-                    continue;
-                }
-
-                needCache.push(path);
-            }
-
-            if (needCache.length === 0) {
-                this.onReadyLoadRes_RiverIn();
-            } else {
-                this._isLoadRes = true;
-                cc.loader.load(needCache, this.onReadyLoadRes_RiverIn.bind(this));
-            }
+            // var needCache = [];
+            // for (var index = 0; index < this._res.length; index++) {
+            //     var path = this._res[index];
+            //     if (!path) {
+            //         continue;
+            //     }
+            //
+            //     if (cc.loader.cache[path]) {
+            //         continue;
+            //     }
+            //
+            //     needCache.push(path);
+            // }
+            //
+            // if (needCache.length === 0) {
+            //     this.onReadyLoadRes_RiverIn();
+            // } else {
+            //     this._isLoadRes = true;
+            //     cc.loader.load(needCache, this.onReadyLoadRes_RiverIn.bind(this));
+            // }
+            this.onReadyLoadRes_RiverIn();
         },
         
         createViewNode: function (filePath) {
@@ -80,7 +83,7 @@
             }
 
             this._node.setVisible(false);
-            this.scheduleOnce(this.onDestroy_RiverIn, 0);
+            this._node.scheduleOnce(this.onDestroy_RiverIn.bind(this), 0, this._name + "_onDestroy_RiverIn");
         },
 
         pause: function () {
@@ -135,26 +138,55 @@
         },
 
         getChild: function (name, parent) {
-            if (!this._node) {
-                return;
-            }
-
             var returnValue = null;
             var findNode = parent || this._node;
+            if (!findNode) {
+                cc.warn("getChild node is null");
+                return null;
+            }
+
             var nodeNameList = name.split(FIND_NODE_MID_SIGN);
             while (nodeNameList.length > 0) {
                 var childName = nodeNameList.shift();
                 returnValue = findNode.getChildByName(childName);
                 if (!returnValue) {
+                    cc.warn("getChild not find by name :", childName);
                     return null;
                 }
+                findNode = returnValue;
             }
 
             return returnValue;
         },
 
+        getChildMistiness: function (name, parent) {
+            var findNode = parent || this._node;
+            if (!findNode) {
+                cc.warn("getChildMistiness node is null");
+                return null;
+            }
+
+            return ccui.helper.seekWidgetByName(findNode, name);
+        },
+
         addTouch: function (name, endTouchCallBack, beginTouchCallBack, moveTouchCallBack) {
             var touchNode = this.getChild(name);
+            if (!touchNode) {
+                return false;
+            }
+
+            this._touchHandlerMap[name] = {
+                endTouchCallBack: endTouchCallBack,
+                beginTouchCallBack: beginTouchCallBack,
+                moveTouchCallBack: moveTouchCallBack
+            };
+
+            touchNode.riverName = name;
+            touchNode.addTouchEventListener(this.onAllTouch_RiverIn, this);
+        },
+
+        addTouchMistiness: function (name, endTouchCallBack, beginTouchCallBack, moveTouchCallBack) {
+            var touchNode = this.getChildMistiness(name);
             if (!touchNode) {
                 return false;
             }
@@ -206,15 +238,19 @@
 
             if (typeEnum === ccui.Widget.TOUCH_BEGAN) {
                 if (touchNode.beginTouchCallBack) {
-                    touchNode.beginTouchCallBack();
+                    touchNode.beginTouchCallBack.call(this, target);
                 }
             } else if (typeEnum === ccui.Widget.TOUCH_MOVED) {
                 if (touchNode.moveTouchCallBack) {
-                    touchNode.moveTouchCallBack();
+                    touchNode.moveTouchCallBack.call(this, target);
                 }
             } else if (typeEnum === ccui.Widget.TOUCH_ENDED) {
                 if (touchNode.endTouchCallBack) {
-                    touchNode.endTouchCallBack();
+                    touchNode.endTouchCallBack.call(this, target);
+                }
+            } else if (typeEnum === ccui.Widget.TOUCH_CANCELED) {
+                if (touchNode.endTouchCallBack) {
+                    touchNode.endTouchCallBack.call(this, target, true);
                 }
             }
         },

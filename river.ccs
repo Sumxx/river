@@ -5,6 +5,7 @@
       <RootFolder Name=".">
         <Image Name="HelloWorld.png" />
         <Project Name="mainLayer.csd" Type="Layer" />
+        <Project Name="test2layer.csd" Type="Layer" />
       </RootFolder>
     </Group>
   </SolutionFolder>

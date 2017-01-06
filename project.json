@@ -27,6 +27,7 @@
 
         "src/main_logic.js",
         "src/main_layer.js",
+        "src/test2_layer.js",
         "src/server_emitter.js"
     ]
 }
