@@ -1,6 +1,14 @@
 (function () {
     var FIND_NODE_MID_SIGN = '.';
 
+    // view globe setting
+    river.View.GlobeConfig = {
+        touchDefaultBeginCB: function () {},
+        touchDefaultEndCB: function () {},
+        touchDefaultMoveCB: function () {},
+        touchDefaultCancelCB: function () {}
+    };
+
     river.View = cc.Class.extend({
         _name: 'river.view',
         _touchHandlerMap: null,
@@ -101,11 +109,11 @@
                 return;
             }
 
+            river.viewMgr.emit(this._name + '.pause', this._node);
             this.onPause();
             this._isPause = true;
             this._node.retain();
             this._node.removeFromParent();
-            river.ViewMgr.eventMessage(this._name + '.pause', this._node);
         },
 
         resume: function () {
@@ -117,6 +125,7 @@
                 return;
             }
 
+            river.viewMgr.emit(this._name + '.resume', this._node);
             this.onResume();
             this._isPause = false;
             this._node.release();
@@ -238,18 +247,22 @@
 
             if (typeEnum === ccui.Widget.TOUCH_BEGAN) {
                 if (touchNode.beginTouchCallBack) {
+                    river.View.GlobeConfig.touchDefaultBeginCB.call(this, target);
                     touchNode.beginTouchCallBack.call(this, target);
                 }
             } else if (typeEnum === ccui.Widget.TOUCH_MOVED) {
                 if (touchNode.moveTouchCallBack) {
+                    river.View.GlobeConfig.touchDefaultMoveCB.call(this, target);
                     touchNode.moveTouchCallBack.call(this, target);
                 }
             } else if (typeEnum === ccui.Widget.TOUCH_ENDED) {
                 if (touchNode.endTouchCallBack) {
+                    river.View.GlobeConfig.touchDefaultEndCB.call(this, target);
                     touchNode.endTouchCallBack.call(this, target);
                 }
             } else if (typeEnum === ccui.Widget.TOUCH_CANCELED) {
                 if (touchNode.endTouchCallBack) {
+                    river.View.GlobeConfig.touchDefaultCancelCB.call(this, target, true);
                     touchNode.endTouchCallBack.call(this, target, true);
                 }
             }
@@ -260,8 +273,10 @@
             this._isReady = true;
             this._isShowing = true;
             if (this._param && this._param.length > 0) {
+                river.viewMgr.emit(this._name + '.show', this._node);
                 this.onShow.apply(this, this._param);
             } else {
+                river.viewMgr.emit(this._name + '.show', this._node);
                 this.onShow();
             }
         },
@@ -274,6 +289,7 @@
                 return;
             }
 
+            river.viewMgr.emit(this._name + '.hide', this._node);
             this.onHide();
             this._node.removeFromParent();
             this._node = null;
